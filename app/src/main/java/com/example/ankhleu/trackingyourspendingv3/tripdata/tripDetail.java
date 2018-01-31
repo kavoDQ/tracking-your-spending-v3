@@ -5,6 +5,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.example.ankhleu.trackingyourspendingv3.FragmentBill;
+import com.example.ankhleu.trackingyourspendingv3.MainActivity;
 import com.example.ankhleu.trackingyourspendingv3.Tripadddetail;
 
 import java.util.ArrayList;
@@ -18,7 +20,7 @@ public class tripDetail implements tripDetailDAO {
     Context context;
     SQLiteDatabase db;
 
-    public tripDetail(Context context) {
+    public tripDetail(MainActivity context) {
         this.context = context;
         tripDB helper = new tripDB(context);
         db = helper.getWritableDatabase();

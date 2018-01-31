@@ -3,6 +3,8 @@ package com.example.ankhleu.trackingyourspendingv3;
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -14,8 +16,12 @@ import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.ankhleu.trackingyourspendingv3.tripdata.tripDAO;
+import com.example.ankhleu.trackingyourspendingv3.tripdata.tripDB;
 import com.example.ankhleu.trackingyourspendingv3.tripdata.tripDetail;
+import com.example.ankhleu.trackingyourspendingv3.tripdata.tripDetailDAO;
 import com.example.ankhleu.trackingyourspendingv3.tripdata.tripadd;
 
 import java.util.ArrayList;
@@ -32,11 +38,13 @@ import java.util.Calendar;
  */
 public class FragmentBill extends Fragment implements View.OnClickListener
 {
-    View view;
-    TextView tv3;
+    SQLiteDatabase db;
     FloatingActionButton fb1,fb2,fb3;
     ListView lv;
-
+    tripDB dbhelper;
+    String idStr,titleStr, startdateStr ,enddateStr,budgetStr ;
+    private Cursor result;
+    private ArrayList<String> trip =new ArrayList<String>();
 
 
     // TODO: Rename parameter arguments, choose names that match
@@ -80,7 +88,6 @@ public class FragmentBill extends Fragment implements View.OnClickListener
         //    fb1=(FloatingActionButton)getActivity().findViewById(R.id.floatingActionButton3) ;
         // 要用getactivity,fragment生命週期在onActivityCreated之後
 
-
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -105,7 +112,31 @@ public class FragmentBill extends Fragment implements View.OnClickListener
 //        fb1.setOnClickListener(this);
 //        return view;
 
-        return inflater.inflate(R.layout.fragment_bill, container, false);
+        View mview = inflater.inflate(R.layout.fragment_bill, container, false);
+        ListView listView = mview.findViewById(R.id.listview); //list的實體化
+        dbhelper = new tripDB(mview.getContext()); //dbHelper的實體化
+        db = dbhelper.getReadableDatabase(); //讀取
+        String sql = "select _id, Title, startdate, enddate,budget from trip where _id='' order by _id";
+        result = db.rawQuery(sql, null);
+        int resultCounts = result.getCount();
+        if (resultCounts == 0 || !result.moveToFirst()) {
+            Toast.makeText(getActivity(), "無資料", Toast.LENGTH_SHORT).show();
+        } else {
+            while (!result.isAfterLast()) {
+                idStr = String.valueOf(result.getInt(result.getColumnIndex("id"))) + "\t";
+                titleStr = result.getString(result.getColumnIndex("Title")) + ":\t";
+                startdateStr = result.getString(result.getColumnIndex("startdate")) + "\t";
+                enddateStr = result.getString(result.getColumnIndex("enddate")) + "\t";
+                budgetStr = result.getString(result.getColumnIndex("budget"));
+                trip.add(idStr + titleStr + startdateStr + enddateStr + budgetStr);
+                result.moveToNext();
+            }
+        }
+        listView.setAdapter(new ArrayAdapter<String>(getActivity(), R.layout.fragment_bill, trip));
+        db.close();
+        return mview;
+//        return inflater.inflate(R.layout.fragment_bill, container, false);
+
         // Inflate the layout for this fragment
 
 

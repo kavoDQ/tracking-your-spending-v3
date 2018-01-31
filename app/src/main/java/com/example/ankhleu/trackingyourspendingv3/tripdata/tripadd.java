@@ -5,6 +5,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.example.ankhleu.trackingyourspendingv3.FragmentBill;
+import com.example.ankhleu.trackingyourspendingv3.MainActivity;
 import com.example.ankhleu.trackingyourspendingv3.Newstart;
 
 import java.util.ArrayList;
@@ -18,7 +20,7 @@ public class tripadd implements tripDAO {
     Context context;
     SQLiteDatabase db;
 
-    public tripadd(Context context)   //新增資烙用
+    public tripadd(MainActivity context)   //新增資烙用
     {
         this.context = context;
         tripDB helper = new tripDB(context);

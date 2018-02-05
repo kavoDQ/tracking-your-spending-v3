@@ -12,12 +12,14 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Adapter;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.ankhleu.trackingyourspendingv3.tripdata.Adapter_tripshow;
 import com.example.ankhleu.trackingyourspendingv3.tripdata.tripDAO;
 import com.example.ankhleu.trackingyourspendingv3.tripdata.tripDB;
 import com.example.ankhleu.trackingyourspendingv3.tripdata.tripDetail;
@@ -38,9 +40,10 @@ import java.util.Calendar;
  */
 public class FragmentBill extends Fragment implements View.OnClickListener
 {
+    tripDB tdb;
     SQLiteDatabase db;
     FloatingActionButton fb1,fb2,fb3;
-    ListView lv;
+//    ListView lv;
     tripDB dbhelper;
     String idStr,titleStr, startdateStr ,enddateStr,budgetStr ;
     private Cursor result;
@@ -107,34 +110,75 @@ public class FragmentBill extends Fragment implements View.OnClickListener
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-//        view=inflater.inflate(R.layout.activity_startact,container,false);
+
+        View vi = inflater.inflate(R.layout.fragment_bill, container, false);
+        ListView lv = vi.findViewById(R.id.listview);
+        ArrayList<String> tripidd = tripnames();
+
+        tdb = new tripDB(getActivity(), "title", null, 1);
+        Adapter_tripshow adapterTripidd = new Adapter_tripshow(tripidd, getActivity());
+        lv.setAdapter(adapterTripidd);
+
+        return vi;
+        }
+
+
+        boolean connectToDatabase()
+        {
+            db = tdb.getWritableDatabase();
+            if (db != null) {
+                return true;
+            }
+            return false;
+        }
+
+
+
+        ArrayList<String> tripnames()
+        {
+            ArrayList<String> tripid = new ArrayList<>();
+            if(connectToDatabase())
+            {
+                Cursor cursor = db.rawQuery("SELECT Title FROM trip",null);
+                if(cursor.moveToFirst())
+                {
+                    do{
+                        tripid.add(cursor.getString(0));
+                    } while (cursor.moveToNext());
+                }
+                db.close();
+            }
+            return tripid;
+        }
+
 //        fb1=(FloatingActionButton)view.findViewById(R.id.floatingActionButton);
 //        fb1.setOnClickListener(this);
 //        return view;
 
-        View mview = inflater.inflate(R.layout.fragment_bill, container, false);
-        ListView listView = mview.findViewById(R.id.listview); //list的實體化
-        dbhelper = new tripDB(mview.getContext()); //dbHelper的實體化
-        db = dbhelper.getReadableDatabase(); //讀取
-        String sql = "select _id, Title, startdate, enddate,budget from trip where _id='' order by _id";
-        result = db.rawQuery(sql, null);
-        int resultCounts = result.getCount();
-        if (resultCounts == 0 || !result.moveToFirst()) {
-            Toast.makeText(getActivity(), "無資料", Toast.LENGTH_SHORT).show();
-        } else {
-            while (!result.isAfterLast()) {
-                idStr = String.valueOf(result.getInt(result.getColumnIndex("id"))) + "\t";
-                titleStr = result.getString(result.getColumnIndex("Title")) + ":\t";
-                startdateStr = result.getString(result.getColumnIndex("startdate")) + "\t";
-                enddateStr = result.getString(result.getColumnIndex("enddate")) + "\t";
-                budgetStr = result.getString(result.getColumnIndex("budget"));
-                trip.add(idStr + titleStr + startdateStr + enddateStr + budgetStr);
-                result.moveToNext();
-            }
-        }
-        listView.setAdapter(new ArrayAdapter<String>(getActivity(), R.layout.fragment_bill, trip));
-        db.close();
-        return mview;
+//        View mview = inflater.inflate(R.layout.fragment_bill, container, false);
+//        ListView listView = mview.findViewById(R.id.listview); //list的實體化
+//        dbhelper = new tripDB(mview.getContext()); //dbHelper的實體化
+//        db = dbhelper.getReadableDatabase(); //讀取
+//        String sql = "select _id, Title, startdate, enddate,budget from trip where _id='' order by _id";
+//        result = db.rawQuery(sql, null);
+//        int resultCounts = result.getCount();
+//        if (resultCounts == 0 || !result.moveToFirst()) {
+//            Toast.makeText(getActivity(), "無資料", Toast.LENGTH_SHORT).show();
+//        } else {
+//            while (!result.isAfterLast()) {
+//                idStr = String.valueOf(result.getInt(result.getColumnIndex("id"))) + "\t";
+//                titleStr = result.getString(result.getColumnIndex("Title")) + ":\t";
+//                startdateStr = result.getString(result.getColumnIndex("startdate")) + "\t";
+//                enddateStr = result.getString(result.getColumnIndex("enddate")) + "\t";
+//                budgetStr = result.getString(result.getColumnIndex("budget"));
+//                trip.add(idStr + titleStr + startdateStr + enddateStr + budgetStr);
+//                result.moveToNext();
+//            }
+//        }
+//        listView.setAdapter(new ArrayAdapter<String>(getActivity(), R.layout.fragment_bill, trip));
+//        db.close();
+//        return mview;
+//
 //        return inflater.inflate(R.layout.fragment_bill, container, false);
 
         // Inflate the layout for this fragment
@@ -151,7 +195,7 @@ public class FragmentBill extends Fragment implements View.OnClickListener
         });
         return rootView;        //此段目前先不用
 */
-    }
+
 
     @Override
     public void onActivityCreated( Bundle savedInstanceState) {
